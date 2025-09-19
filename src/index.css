@@ -210,11 +210,25 @@ a:hover {
 
 
 .centered-container {
-  display: flex; /* Enable Flexbox on the container */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  min-height: 100vh; /* Ensure the container is at least the full height of the viewport */
-  width: 100%; /* Ensure the container spans the full width */
+  @apply flex items-center justify-center min-h-screen w-full;
+}
+
+/* Improved centering utilities */
+.center-flex {
+  @apply flex items-center justify-center;
+}
+
+.center-content {
+  @apply flex flex-col items-center justify-center min-h-screen px-4 py-8;
+}
+
+/* Responsive container */
+.responsive-container {
+  @apply w-full max-w-6xl mx-auto px-4;
+}
+
+.responsive-card {
+  @apply w-full max-w-md mx-auto;
 }
 
 /* Matrix Rain Effect Background */
@@ -550,7 +564,53 @@ a:hover {
   }
   
   .card {
-    @apply p-4;
+    @apply p-4 mx-2;
+  }
+  
+  /* Improve mobile centering */
+  .center-content {
+    @apply px-2 py-4;
+  }
+  
+  .responsive-card {
+    @apply mx-2;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .responsive-container {
+    @apply px-2;
+  }
+  
+  .responsive-card {
+    @apply mx-1;
+  }
+  
+  /* Stack elements better on very small screens */
+  .card {
+    @apply p-3;
+  }
+  
+  /* Better mobile typography */
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  /* Improve button spacing on mobile */
+  .btn {
+    @apply px-3 py-2 text-xs;
+  }
+}
+
+/* Very large screens */
+@media (min-width: 1200px) {
+  .responsive-container {
+    @apply max-w-7xl;
   }
 }
 

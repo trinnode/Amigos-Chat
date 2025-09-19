@@ -71,9 +71,9 @@ const ChatPage = () => {
   };
 
   return (
-    <div className="h-screen flex bg-amigo-black">
+    <div className="h-screen flex bg-amigo-black relative">
       {/* Left Sidebar - User List */}
-      <div className="w-64 bg-amigo-gray border-r border-amigo-gray-light flex flex-col">
+      <div className="hidden md:flex w-64 bg-amigo-gray border-r border-amigo-gray-light flex-col">
         {/* Header */}
         <div className="p-4 border-b border-amigo-gray-light">
           <div className="flex items-center space-x-3">
@@ -145,7 +145,22 @@ const ChatPage = () => {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile Header with Logo and User Count */}
+        <div className="md:hidden bg-amigo-gray border-b border-amigo-gray-light p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <img src="/logo.png" alt="AmigoChat" className="w-6 h-6" />
+              <h1 className="text-amigo-green font-bold font-mono text-sm">
+                AmigosChat
+              </h1>
+            </div>
+            <div className="text-amigo-white font-mono text-xs">
+              {users.length} amigos online
+            </div>
+          </div>
+        </div>
+
         {/* Chat Header */}
         <div className="bg-amigo-gray border-b border-amigo-gray-light p-4">
           <div className="flex items-center justify-between">

@@ -71,10 +71,12 @@ const LoadingSpinner = ({
  */
 export const FullPageLoader = ({ message = "Loading..." }) => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-amigo-black">
-      <div className="text-center">
+    <div className="min-h-screen flex items-center justify-center bg-amigo-black px-4">
+      <div className="text-center max-w-sm w-full">
         <LoadingSpinner size="large" />
-        <h2 className="mt-6 text-xl font-mono text-amigo-white">{message}</h2>
+        <h2 className="mt-6 text-lg md:text-xl font-mono text-amigo-white">
+          {message}
+        </h2>
         <div className="mt-4 flex justify-center space-x-1">
           <div className="w-2 h-2 bg-amigo-green rounded-full animate-pulse"></div>
           <div

@@ -43,10 +43,10 @@ const ProtectedRoute = ({
     !hasCheckedRequirements
   ) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-center max-w-sm w-full">
           <LoadingSpinner size="large" />
-          <p className="mt-4 text-amigo-green font-mono">
+          <p className="mt-4 text-amigo-green font-mono text-sm">
             {isConnecting && "Connecting wallet..."}
             {isCheckingRegistration && "Checking registration..."}
             {!isConnecting && !isCheckingRegistration && "Loading..."}

@@ -54,12 +54,12 @@ function App() {
           showRecentTransactions={true}
         >
           <Router>
-            <div className="centered-container min-h-screen bg-amigo-black text-amigo-white font-mono relative overflow-hidden flex flex-col">
+            <div className="min-h-screen bg-amigo-black text-amigo-white font-mono relative overflow-hidden">
               {/* Animated Matrix Background - adds cyberpunk aesthetic */}
               <MatrixBackground />
 
               {/* Main Application Routes */}
-              <div className="flex-1 flex flex-col">
+              <div className="relative z-10">
                 <Routes>
                   {/* Landing Page - entry point for all users */}
                   <Route path="/" element={<LandingPage />} />

@@ -62,8 +62,8 @@ const ProfilePage = () => {
 
   if (loadingProfile) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-center max-w-sm w-full">
           <div className="w-12 h-12 border-2 border-amigo-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-amigo-green font-mono">Loading profile...</p>
         </div>
@@ -76,12 +76,12 @@ const ProfilePage = () => {
       {/* Header */}
       <div className="bg-amigo-gray border-b border-amigo-gray-light">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center space-x-4">
-              <Link to="/chat" className="btn btn-ghost">
+              <Link to="/chat" className="btn btn-ghost text-sm">
                 ← Back to Chat
               </Link>
-              <h1 className="text-2xl font-bold text-amigo-green font-mono">
+              <h1 className="text-xl md:text-2xl font-bold text-amigo-green font-mono">
                 Profile Settings
               </h1>
             </div>
@@ -91,7 +91,7 @@ const ProfilePage = () => {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
           {/* Profile Card */}
           <Motion.div
             initial={{ opacity: 0, y: 20 }}

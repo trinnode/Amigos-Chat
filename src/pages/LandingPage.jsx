@@ -82,15 +82,15 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden justify-center text-center">
+    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4 py-8">
       {/* Hero Section */}
       <Motion.main
-        className="flex-1 flex items-center justify-center px-4 py-8"
+        className="flex-1 flex items-center justify-center w-full max-w-6xl mx-auto"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <div className="max-w-6xl mx-auto text-center">
+        <div className="text-center w-full">
           {/* Animated Logo */}
           <Motion.div
             className="mb-8 flex justify-center"
@@ -113,7 +113,7 @@ const LandingPage = () => {
           {/* Main Title with Glitch Effect */}
           <Motion.div variants={itemVariants} className="mb-6">
             <h1
-              className="text-6xl md:text-8xl font-bold text-amigo-green mb-4 glitch"
+              className="text-4xl md:text-6xl lg:text-8xl font-bold text-amigo-green mb-4 glitch"
               data-text="AMIGOCHAT"
             >
               AMIGOsCHAT
@@ -124,7 +124,7 @@ const LandingPage = () => {
           {/* Tagline */}
           <Motion.p
             variants={itemVariants}
-            className="text-xl md:text-2xl text-amigo-white mb-8 font-mono"
+            className="text-lg md:text-xl lg:text-2xl text-amigo-white mb-8 font-mono"
           >
             Connect. Chat. Decentralize.
           </Motion.p>

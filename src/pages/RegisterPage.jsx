@@ -198,17 +198,17 @@ const RegisterPage = () => {
   // Show success message
   if (registerSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <Motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="text-center"
+          className="text-center max-w-sm w-full"
         >
           <div className="text-6xl mb-4">🎉</div>
-          <h2 className="text-3xl font-bold text-amigo-green mb-2">
-            Welcome to AmigoChat!
+          <h2 className="text-2xl md:text-3xl font-bold text-amigo-green mb-2">
+            Welcome to AmigosChat!
           </h2>
-          <p className="text-amigo-gray-light mb-4">
+          <p className="text-amigo-gray-light mb-4 text-sm md:text-base">
             Your registration was successful. Redirecting to chat...
           </p>
           <div className="animate-pulse text-amigo-green">●●●</div>
@@ -220,17 +220,17 @@ const RegisterPage = () => {
   // Show transaction confirming state
   if (isConfirming) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <Motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="text-center"
+          className="text-center max-w-sm w-full"
         >
           <div className="text-6xl mb-4">⏳</div>
-          <h2 className="text-3xl font-bold text-amigo-green mb-2">
+          <h2 className="text-2xl md:text-3xl font-bold text-amigo-green mb-2">
             Confirming Registration
           </h2>
-          <p className="text-amigo-gray-light mb-4">
+          <p className="text-amigo-gray-light mb-4 text-sm md:text-base">
             Your transaction is being confirmed on the blockchain...
           </p>
           <div className="animate-pulse text-amigo-green">●●●</div>
@@ -242,7 +242,7 @@ const RegisterPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8">
       <Motion.div
-        className="max-w-md w-full"
+        className="w-full max-w-md mx-auto"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -250,7 +250,7 @@ const RegisterPage = () => {
         {/* Header */}
         <Motion.div variants={itemVariants} className="text-center mb-8">
           <h1 className="text-4xl font-bold text-amigo-green mb-2">
-            Join AmigoChat
+            Join AmigosChat
           </h1>
           <p className="text-amigo-gray-light font-mono">
             Create your decentralized identity
@@ -281,7 +281,7 @@ const RegisterPage = () => {
           {step === 1 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-amigo-white text-center">
-                Choose Your Avatar
+                Choose Your amigo avatar
               </h2>
 
               {/* File upload area */}
