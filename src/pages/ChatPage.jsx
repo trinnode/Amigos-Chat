@@ -78,7 +78,7 @@ const ChatPage = () => {
         <div className="p-4 border-b border-amigo-gray-light">
           <div className="flex items-center space-x-3">
             <img src="/logo.png" alt="AmigoChat" className="w-8 h-8" />
-            <h1 className="text-amigo-green font-bold font-mono">AmigoChat</h1>
+            <h1 className="text-amigo-green font-bold font-mono">AmigosChat</h1>
           </div>
         </div>
 
