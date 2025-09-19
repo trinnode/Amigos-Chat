@@ -24,21 +24,26 @@ const LandingPage = () => {
   const [showFeatures, setShowFeatures] = useState(false);
   const [isAnimating, setIsAnimating] = useState(true);
 
-  // Handle automatic redirection after wallet connection
+  // Handle navigation - only redirect unregistered users after connection
   useEffect(() => {
-    if (isConnected && !isLoading) {
-      // Small delay for smooth transition
+    if (isConnected && !isLoading && !isRegistered) {
+      // Only auto-redirect unregistered users to registration
       const timer = setTimeout(() => {
-        if (isRegistered) {
-          navigate("/chat");
-        } else {
-          navigate("/register");
-        }
+        navigate("/register");
       }, 1500);
 
       return () => clearTimeout(timer);
     }
   }, [isConnected, isRegistered, isLoading, navigate]);
+
+  // Manual navigation functions
+  const goToChat = () => {
+    navigate("/chat");
+  };
+
+  const goToRegister = () => {
+    navigate("/register");
+  };
 
   // Animation variants for framer-Motion
   const containerVariants = {
@@ -82,7 +87,7 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4 py-8">
+    <div className="w-full min-h-screen flex flex-col items-center justify-center relative px-4 py-8">
       {/* Hero Section */}
       <Motion.main
         className="flex-1 flex items-center justify-center w-full max-w-6xl mx-auto"
@@ -90,7 +95,7 @@ const LandingPage = () => {
         initial="hidden"
         animate="visible"
       >
-        <div className="text-center w-full">
+        <div className="text-center w-full max-w-4xl mx-auto">
           {/* Animated Logo */}
           <Motion.div
             className="mb-8 flex justify-center"
@@ -217,21 +222,60 @@ const LandingPage = () => {
               <Motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="text-center space-y-4"
+                className="text-center space-y-6"
               >
                 <div className="text-amigo-green text-2xl font-bold">
                   ✅ Wallet Connected!
                 </div>
-                <p className="text-amigo-white font-mono">
-                  {isLoading
-                    ? "Checking registration..."
-                    : isRegistered
-                    ? "Redirecting to chat..."
-                    : "Redirecting to registration..."}
-                </p>
-                <div className="flex justify-center">
-                  <div className="w-8 h-8 border-2 border-amigo-green border-t-transparent rounded-full animate-spin"></div>
-                </div>
+
+                {isLoading ? (
+                  <>
+                    <p className="text-amigo-white font-mono">
+                      Checking registration status...
+                    </p>
+                    <div className="flex justify-center">
+                      <div className="w-8 h-8 border-2 border-amigo-green border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  </>
+                ) : isRegistered ? (
+                  <>
+                    <p className="text-amigo-white font-mono">
+                      Welcome back! Ready to chat with amigos?
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <Motion.button
+                        onClick={goToChat}
+                        className="btn btn-primary text-lg px-8 py-4 font-bold"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        🚀 Enter Chat
+                      </Motion.button>
+                      <Motion.button
+                        onClick={() => navigate("/profile")}
+                        className="btn btn-secondary text-lg px-8 py-4"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        ⚙️ Profile
+                      </Motion.button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-amigo-white font-mono">
+                      You're not registered yet. Create your amigo profile!
+                    </p>
+                    <Motion.button
+                      onClick={goToRegister}
+                      className="btn btn-primary text-lg px-8 py-4 font-bold"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      📝 Register Now
+                    </Motion.button>
+                  </>
+                )}
               </Motion.div>
             )}
           </Motion.div>

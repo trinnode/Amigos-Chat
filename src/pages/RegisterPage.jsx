@@ -256,10 +256,11 @@ const RegisterPage = () => {
     );
   }
 
+  
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8">
+    <div className="w-full min-h-screen flex items-center justify-center px-4 py-8">
       <Motion.div
-        className="w-full max-w-md mx-auto"
+        className="w-full max-w-2xl mx-auto"
         variants={containerVariants}
         initial="hidden"
         animate="visible"

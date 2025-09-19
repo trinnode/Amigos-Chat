@@ -272,27 +272,173 @@ export const useChangeUsername = () => {
   };
 };
 
-// Hook to get price feeds
-export const usePriceFeeds = () => {
-  const {
-    data: prices,
-    isError,
-    isLoading,
-    refetch,
-  } = useReadContract({
-    address: CONTRACT_INFO.address,
-    abi: AMIGO_CHAT_ABI,
-    functionName: "getAllPrices",
+// Chainlink AggregatorV3Interface ABI
+const CHAINLINK_ABI = [
+  {
+    inputs: [],
+    name: "decimals",
+    outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "description",
+    outputs: [{ internalType: "string", name: "", type: "string" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint80", name: "_roundId", type: "uint80" }],
+    name: "getRoundData",
+    outputs: [
+      { internalType: "uint80", name: "roundId", type: "uint80" },
+      { internalType: "int256", name: "answer", type: "int256" },
+      { internalType: "uint256", name: "startedAt", type: "uint256" },
+      { internalType: "uint256", name: "updatedAt", type: "uint256" },
+      { internalType: "uint80", name: "answeredInRound", type: "uint80" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "latestRoundData",
+    outputs: [
+      { internalType: "uint80", name: "roundId", type: "uint80" },
+      { internalType: "int256", name: "answer", type: "int256" },
+      { internalType: "uint256", name: "startedAt", type: "uint256" },
+      { internalType: "uint256", name: "updatedAt", type: "uint256" },
+      { internalType: "uint80", name: "answeredInRound", type: "uint80" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "version",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+];
+
+// Chainlink price feed addresses from environment
+const PRICE_FEED_ADDRESSES = {
+  BTC_USD: import.meta.env.VITE_CHAINLINK_BTC_USD_FEED,
+  ETH_USD: import.meta.env.VITE_CHAINLINK_ETH_USD_FEED,
+  LINK_USD: import.meta.env.VITE_CHAINLINK_LINK_USD_FEED,
+};
+
+// Hook to get BTC price from Chainlink
+export const useBTCPrice = () => {
+  return useReadContract({
+    address: PRICE_FEED_ADDRESSES.BTC_USD,
+    abi: CHAINLINK_ABI,
+    functionName: "latestRoundData",
     query: {
       refetchInterval: 30000, // Refetch every 30 seconds
+      staleTime: 25000, // Consider data stale after 25 seconds
     },
   });
+};
+
+// Hook to get ETH price from Chainlink
+export const useETHPrice = () => {
+  return useReadContract({
+    address: PRICE_FEED_ADDRESSES.ETH_USD,
+    abi: CHAINLINK_ABI,
+    functionName: "latestRoundData",
+    query: {
+      refetchInterval: 30000,
+      staleTime: 25000,
+    },
+  });
+};
+
+// Hook to get LINK price from Chainlink
+export const useLINKPrice = () => {
+  return useReadContract({
+    address: PRICE_FEED_ADDRESSES.LINK_USD,
+    abi: CHAINLINK_ABI,
+    functionName: "latestRoundData",
+    query: {
+      refetchInterval: 30000,
+      staleTime: 25000,
+    },
+  });
+};
+
+// Hook to get price feeds
+export const usePriceFeeds = () => {
+  const [prices, setPrices] = useState({ btc: null, eth: null, link: null });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+
+  // Get individual price feeds
+  const {
+    data: btcData,
+    isLoading: btcLoading,
+    isError: btcError,
+  } = useBTCPrice();
+  const {
+    data: ethData,
+    isLoading: ethLoading,
+    isError: ethError,
+  } = useETHPrice();
+  const {
+    data: linkData,
+    isLoading: linkLoading,
+    isError: linkError,
+  } = useLINKPrice();
+
+  // Helper function to format price from Chainlink data
+  const formatPrice = useCallback((data, decimals = 8) => {
+    if (!data || !data[1]) return null;
+    const price = Number(data[1]) / Math.pow(10, decimals);
+    return price.toFixed(2);
+  }, []);
+
+  // Update prices when data changes
+  useEffect(() => {
+    setIsLoading(btcLoading || ethLoading || linkLoading);
+    setIsError(btcError || ethError || linkError);
+
+    const newPrices = {
+      btc: formatPrice(btcData, 8), // BTC/USD has 8 decimals
+      eth: formatPrice(ethData, 8), // ETH/USD has 8 decimals
+      link: formatPrice(linkData, 8), // LINK/USD has 8 decimals
+    };
+
+    // Only update if we have at least one valid price
+    if (newPrices.btc || newPrices.eth || newPrices.link) {
+      setPrices(newPrices);
+    }
+  }, [
+    btcData,
+    ethData,
+    linkData,
+    btcLoading,
+    ethLoading,
+    linkLoading,
+    btcError,
+    ethError,
+    linkError,
+    formatPrice,
+  ]);
+
+  const fetchPrices = useCallback(async () => {
+    // The prices are automatically updated by the individual hooks
+    // This function exists for compatibility but doesn't need to do anything
+    // as the data is automatically refetched every 30 seconds
+    console.log("Price feeds are automatically updated every 30 seconds");
+  }, []);
 
   return {
-    prices: prices || [0, 0, 0],
+    prices,
     isLoading,
     isError,
-    refetch,
+    fetchPrices,
   };
 };
 

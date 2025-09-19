@@ -53,15 +53,22 @@
 html {
   height: 100%;
   scroll-behavior: smooth;
+  width: 100%;
 }
 
 body {
   height: 100%;
+  width: 100%;
   font-family: var(--font-mono);
   background-color: var(--color-black);
   color: var(--color-white);
   line-height: 1.6;
-  overflow-x: hidden;
+  
+  /* Global centering and layout improvements */
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
   
   /* Prevent text selection on UI elements */
   -webkit-font-smoothing: antialiased;
@@ -71,6 +78,21 @@ body {
 #root {
   height: 100%;
   min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure all containers center properly */
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  padding: 0;
 }
 
 /* Typography */
@@ -229,6 +251,31 @@ a:hover {
 
 .responsive-card {
   @apply w-full max-w-md mx-auto;
+}
+
+/* Global Layout Utilities for Perfect Centering */
+.container-centered {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full;
+}
+
+.page-container {
+  @apply min-h-screen flex flex-col items-center justify-center w-full max-w-none mx-auto px-4 py-8;
+}
+
+.content-centered {
+  @apply w-full max-w-4xl mx-auto px-6;
+}
+
+.full-width-centered {
+  @apply w-full flex flex-col items-center justify-center;
+}
+
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.flex-center-col {
+  @apply flex flex-col items-center justify-center;
 }
 
 /* Matrix Rain Effect Background */
