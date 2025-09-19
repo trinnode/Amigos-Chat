@@ -852,8 +852,8 @@ export const AMIGO_CHAT_ABI = [
 export const CONTRACT_INFO = {
   // These will be filled after deployment
   address: import.meta.env.VITE_AMIGO_CHAT_CONTRACT_ADDRESS,
-  deploymentBlock: 26495373, // Block number when contract was deployed
-  deploymentTxHash: "0x7d1915a6064722923ad7835b9a529fa1eb393b5850158e79fc83e89f90c986da", // Transaction hash of deployment
+  deploymentBlock: 9237721, // Block number when contract was deployed
+  deploymentTxHash: "0x6233154a010ea5b2b91ee35550237e7cdbf12f835d1aceb5cec9c83a20c9ed09", // Transaction hash of deployment
   deployer: "0x199674cd60606A67E0Fa9fa28Ef00F58A33d2075", // Address that deployed the contract
 
   // Chainlink price feed addresses on Sepolia
