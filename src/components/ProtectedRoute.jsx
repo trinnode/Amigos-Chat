@@ -24,8 +24,11 @@ const ProtectedRoute = ({
 }) => {
   const location = useLocation();
   const { address, isConnected, isConnecting } = useAccount();
-  const { isRegistered, isLoading: isCheckingRegistration } =
-    useIsUserRegistered();
+  const {
+    isRegistered,
+    isLoading: isCheckingRegistration,
+    refetch,
+  } = useIsUserRegistered();
 
   const [hasCheckedRequirements, setHasCheckedRequirements] = useState(false);
 
@@ -35,6 +38,21 @@ const ProtectedRoute = ({
       setHasCheckedRequirements(true);
     }
   }, [isConnecting, isCheckingRegistration]);
+
+  // Additional effect to refetch registration status when transitioning to chat page
+  useEffect(() => {
+    if (
+      location.pathname === "/chat" &&
+      isConnected &&
+      !isCheckingRegistration
+    ) {
+      // Small delay then refetch to ensure we have latest registration status
+      const timer = setTimeout(() => {
+        refetch();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [location.pathname, isConnected, isCheckingRegistration, refetch]);
 
   // Show loading while checking wallet connection or registration status
   if (
@@ -73,6 +91,21 @@ const ProtectedRoute = ({
 
   // Check registration requirement
   if (requireRegistration && isConnected && !isRegistered) {
+    // Special handling: if we just came from register page, give a bit more time for blockchain to update
+    const comingFromRegister = location.state?.from?.pathname === "/register";
+    if (comingFromRegister && !hasCheckedRequirements) {
+      return (
+        <div className="min-h-screen flex items-center justify-center px-4">
+          <div className="text-center max-w-sm w-full">
+            <div className="w-12 h-12 border-2 border-amigo-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="mt-4 text-amigo-green font-mono text-sm">
+              Verifying registration...
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     // Redirect to registration page
     return (
       <Navigate

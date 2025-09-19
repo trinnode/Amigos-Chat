@@ -26,6 +26,9 @@ export const useIsUserRegistered = () => {
     args: [address],
     query: {
       enabled: !!address && !!CONTRACT_INFO.address,
+      staleTime: 1000 * 30, // Consider data stale after 30 seconds
+      cacheTime: 1000 * 60 * 5, // Cache for 5 minutes
+      refetchOnWindowFocus: true, // Refetch when window gains focus
     },
   });
 

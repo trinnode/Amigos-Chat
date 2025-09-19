@@ -8,6 +8,7 @@ import { motion as Motion } from "framer-motion";
 import {
   useUsernameAvailability,
   useRegisterUser,
+  useIsUserRegistered,
 } from "../hooks/useAmigoContract.js";
 import {
   uploadToIPFS,
@@ -53,6 +54,7 @@ const RegisterPage = () => {
     isConfirmed: registerSuccess,
     error: registerError,
   } = useRegisterUser();
+  const { refetch: refetchRegistrationStatus } = useIsUserRegistered();
 
   // Handle file selection for profile picture
   const handleFileSelect = useCallback(
@@ -173,12 +175,27 @@ const RegisterPage = () => {
         cleanupFilePreview(previewUrl);
       }
 
-      // Navigate to chat after short delay
-      setTimeout(() => {
-        navigate("/chat");
-      }, 2000);
+      // Refetch registration status to ensure cache is updated
+      const performRedirect = async () => {
+        try {
+          await refetchRegistrationStatus();
+          // Wait a bit more to ensure the blockchain state is updated
+          setTimeout(() => {
+            navigate("/chat", { replace: true });
+          }, 1000);
+        } catch (error) {
+          console.error("Error refetching registration status:", error);
+          // Fallback: navigate anyway after longer delay
+          setTimeout(() => {
+            navigate("/chat", { replace: true });
+          }, 3000);
+        }
+      };
+
+      // Start the refetch and redirect process after initial delay
+      setTimeout(performRedirect, 1500);
     }
-  }, [registerSuccess, navigate, previewUrl]);
+  }, [registerSuccess, navigate, previewUrl, refetchRegistrationStatus]);
 
   // Animation variants
   const containerVariants = {
