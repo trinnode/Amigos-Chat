@@ -71,10 +71,10 @@ AmigoChat is a revolutionary decentralized chat application built on the Ethereu
    
    The `.env` file is already configured with the necessary API keys:
    ```env
-   VITE_WALLETCONNECT_PROJECT_ID=1791972b9beafffa2371f595866742ab
-   VITE_ALCHEMY_API_KEY=4EkFRqr0TW4yTDAmYR9AO
+   VITE_WALLETCONNECT_PROJECT_ID=
+   VITE_ALCHEMY_API_KEY=
    VITE_PINATA_JWT=your_pinata_jwt_token
-   VITE_SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/4EkFRqr0TW4yTDAmYR9AO
+   VITE_SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/APIKEY
    ```
 
 4. **Deploy Smart Contract**
