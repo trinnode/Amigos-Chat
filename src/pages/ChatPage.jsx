@@ -65,10 +65,30 @@ const ChatPage = () => {
 
   // Get user by address
   const getUserByAddress = (userAddress) => {
+    if (!userAddress || !users || !Array.isArray(users)) {
+      return null;
+    }
     return users.find(
-      (user) => user.address.toLowerCase() === userAddress.toLowerCase()
+      (user) =>
+        user &&
+        user.address &&
+        user.address.toLowerCase() === userAddress.toLowerCase()
     );
   };
+
+  // Early return if essential data is not ready
+  if (!address) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-center max-w-sm w-full">
+          <div className="w-12 h-12 border-2 border-amigo-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="mt-4 text-amigo-green font-mono text-sm">
+            Loading wallet connection...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex bg-amigo-black relative">
@@ -85,7 +105,7 @@ const ChatPage = () => {
         {/* Users List */}
         <div className="flex-1 overflow-y-auto p-4">
           <h2 className="text-amigo-white font-mono font-bold mb-3 text-sm uppercase tracking-wide">
-            Online Amigos ({users.length})
+            Online Amigos ({(users || []).length})
           </h2>
 
           {loadingUsers ? (
@@ -99,33 +119,37 @@ const ChatPage = () => {
             </div>
           ) : (
             <div className="space-y-1">
-              {users.map((user) => (
-                <div
-                  key={user.address}
-                  className="flex items-center space-x-3 p-2 rounded-lg hover:bg-amigo-gray-light transition-colors cursor-pointer"
-                >
-                  <div className="relative">
-                    <img
-                      src={getIPFSUrl(user.ipfsProfilePicHash) || "/logo.png"}
-                      alt={user.username}
-                      className="w-8 h-8 rounded-full object-cover border border-amigo-green"
-                    />
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-amigo-green rounded-full border border-amigo-gray"></div>
+              {(users || [])
+                .filter((user) => user && user.address)
+                .map((user) => (
+                  <div
+                    key={user.address}
+                    className="flex items-center space-x-3 p-2 rounded-lg hover:bg-amigo-gray-light transition-colors cursor-pointer"
+                  >
+                    <div className="relative">
+                      <img
+                        src={getIPFSUrl(user.ipfsProfilePicHash) || "/logo.png"}
+                        alt={user.username || "Unknown User"}
+                        className="w-8 h-8 rounded-full object-cover border border-amigo-green"
+                      />
+                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-amigo-green rounded-full border border-amigo-gray"></div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-amigo-white font-mono text-sm font-medium truncate">
+                        {user.username || "Unknown User"}
+                      </p>
+                      <p className="text-amigo-gray-light font-mono text-xs truncate">
+                        {user.address === address
+                          ? "You"
+                          : user.address && user.address.length >= 10
+                          ? `${user.address.slice(0, 6)}...${user.address.slice(
+                              -4
+                            )}`
+                          : user.address || "Invalid Address"}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-amigo-white font-mono text-sm font-medium truncate">
-                      {user.username}
-                    </p>
-                    <p className="text-amigo-gray-light font-mono text-xs truncate">
-                      {user.address === address
-                        ? "You"
-                        : `${user.address.slice(0, 6)}...${user.address.slice(
-                            -4
-                          )}`}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           )}
         </div>
@@ -156,7 +180,7 @@ const ChatPage = () => {
               </h1>
             </div>
             <div className="text-amigo-white font-mono text-xs">
-              {users.length} amigos online
+              {(users || []).length} amigos online
             </div>
           </div>
         </div>
@@ -192,56 +216,60 @@ const ChatPage = () => {
                 </div>
               ))}
             </div>
-          ) : messages.length === 0 ? (
+          ) : !messages || messages.length === 0 ? (
             <div className="text-center text-amigo-gray-light font-mono py-8">
               <div className="text-4xl mb-4">💬</div>
               <p>No messages yet. Be the first to say hello!</p>
             </div>
           ) : (
-            messages.map((message, index) => {
-              const user = getUserByAddress(message.sender);
-              const isCurrentUser =
-                message.sender.toLowerCase() === address.toLowerCase();
+            (messages || [])
+              .filter((message) => message && message.sender)
+              .map((message, index) => {
+                const user = getUserByAddress(message.sender);
+                const isCurrentUser =
+                  message.sender &&
+                  address &&
+                  message.sender.toLowerCase() === address.toLowerCase();
 
-              return (
-                <Motion.div
-                  key={`${message.messageId}-${index}`}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex space-x-3 group hover:bg-amigo-gray hover:bg-opacity-30 p-2 rounded-lg transition-colors"
-                >
-                  <img
-                    src={getIPFSUrl(user?.ipfsProfilePicHash) || "/logo.png"}
-                    alt={user?.username || "Unknown"}
-                    className="w-10 h-10 rounded-full object-cover border border-amigo-green flex-shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline space-x-2 mb-1">
-                      <span
-                        className={`font-mono font-bold text-sm ${
-                          isCurrentUser
-                            ? "text-amigo-green"
-                            : "text-amigo-white"
-                        }`}
-                      >
-                        {user?.username || "Unknown"}
-                      </span>
-                      {isCurrentUser && (
-                        <span className="text-amigo-green font-mono text-xs">
-                          (You)
+                return (
+                  <Motion.div
+                    key={`${message.messageId}-${index}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex space-x-3 group hover:bg-amigo-gray hover:bg-opacity-30 p-2 rounded-lg transition-colors"
+                  >
+                    <img
+                      src={getIPFSUrl(user?.ipfsProfilePicHash) || "/logo.png"}
+                      alt={user?.username || "Unknown"}
+                      className="w-10 h-10 rounded-full object-cover border border-amigo-green flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline space-x-2 mb-1">
+                        <span
+                          className={`font-mono font-bold text-sm ${
+                            isCurrentUser
+                              ? "text-amigo-green"
+                              : "text-amigo-white"
+                          }`}
+                        >
+                          {user?.username || "Unknown"}
                         </span>
-                      )}
-                      <span className="text-amigo-gray-light font-mono text-xs">
-                        {formatTime(message.timestamp)}
-                      </span>
+                        {isCurrentUser && (
+                          <span className="text-amigo-green font-mono text-xs">
+                            (You)
+                          </span>
+                        )}
+                        <span className="text-amigo-gray-light font-mono text-xs">
+                          {formatTime(message.timestamp)}
+                        </span>
+                      </div>
+                      <p className="text-amigo-white font-mono text-sm break-words">
+                        {message.content}
+                      </p>
                     </div>
-                    <p className="text-amigo-white font-mono text-sm break-words">
-                      {message.content}
-                    </p>
-                  </div>
-                </Motion.div>
-              );
-            })
+                  </Motion.div>
+                );
+              })
           )}
           <div ref={messagesEndRef} />
         </div>
