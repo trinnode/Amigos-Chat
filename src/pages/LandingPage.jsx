@@ -8,6 +8,7 @@ import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import { useIsUserRegistered } from "../hooks/useAmigoContract.js";
+import ProfileDialog from "../components/ProfileDialog.jsx";
 
 /**
  * Landing Page Component
@@ -23,6 +24,7 @@ const LandingPage = () => {
   // State for UI interactions
   const [showFeatures, setShowFeatures] = useState(false);
   const [isAnimating, setIsAnimating] = useState(true);
+  const [showProfileDialog, setShowProfileDialog] = useState(false);
 
   // Handle navigation - only redirect unregistered users after connection
   useEffect(() => {
@@ -252,7 +254,7 @@ const LandingPage = () => {
                         🚀 Enter Chat
                       </Motion.button>
                       <Motion.button
-                        onClick={() => navigate("/profile")}
+                        onClick={() => setShowProfileDialog(true)}
                         className="btn btn-secondary text-lg px-8 py-4"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -453,6 +455,12 @@ const LandingPage = () => {
         className="absolute top-1/3 right-10 w-5 h-5 bg-amigo-green rounded-full animate-float opacity-15"
         style={{ animationDelay: "6s" }}
       ></div>
+
+      {/* Profile Dialog */}
+      <ProfileDialog
+        isOpen={showProfileDialog}
+        onClose={() => setShowProfileDialog(false)}
+      />
     </div>
   );
 };

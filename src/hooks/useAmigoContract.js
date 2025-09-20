@@ -91,20 +91,17 @@ export const useUsernameAvailability = () => {
     setError(null);
 
     try {
-      // We'll use a direct contract call with viem for this check
-      // This is a temporary implementation until we have proper wagmi setup
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Use wagmi's readContract for real contract interaction
+      const { readContract } = await import("wagmi/actions");
+      const { config } = await import("../config/web3.js");
 
-      // For now, simulate the call - in production this would be:
-      // const available = await readContract({
-      //   address: CONTRACT_INFO.address,
-      //   abi: AMIGO_CHAT_ABI,
-      //   functionName: 'isUsernameAvailable',
-      //   args: [username]
-      // });
+      const available = await readContract(config, {
+        address: CONTRACT_INFO.address,
+        abi: AMIGO_CHAT_ABI,
+        functionName: "isUsernameAvailable",
+        args: [username],
+      });
 
-      // Simple check: usernames starting with 'admin' are not available
-      const available = !username.toLowerCase().startsWith("admin");
       setIsAvailable(available);
 
       if (!available) {
@@ -113,7 +110,8 @@ export const useUsernameAvailability = () => {
 
       return available;
     } catch (err) {
-      setError(err.message);
+      console.error("Error checking username availability:", err);
+      setError(err.message || "Failed to check username availability");
       setIsAvailable(false);
       return false;
     } finally {
@@ -330,43 +328,79 @@ const PRICE_FEED_ADDRESSES = {
   LINK_USD: import.meta.env.VITE_CHAINLINK_LINK_USD_FEED,
 };
 
+// Debug logging for addresses
+console.log("Chainlink Price Feed Addresses:", PRICE_FEED_ADDRESSES);
+
 // Hook to get BTC price from Chainlink
 export const useBTCPrice = () => {
-  return useReadContract({
+  const result = useReadContract({
     address: PRICE_FEED_ADDRESSES.BTC_USD,
     abi: CHAINLINK_ABI,
     functionName: "latestRoundData",
     query: {
+      enabled: !!PRICE_FEED_ADDRESSES.BTC_USD,
       refetchInterval: 30000, // Refetch every 30 seconds
       staleTime: 25000, // Consider data stale after 25 seconds
     },
   });
+
+  // Debug logging
+  console.log("BTC Price Feed:", {
+    address: PRICE_FEED_ADDRESSES.BTC_USD,
+    data: result.data,
+    error: result.error,
+    isLoading: result.isLoading,
+  });
+
+  return result;
 };
 
 // Hook to get ETH price from Chainlink
 export const useETHPrice = () => {
-  return useReadContract({
+  const result = useReadContract({
     address: PRICE_FEED_ADDRESSES.ETH_USD,
     abi: CHAINLINK_ABI,
     functionName: "latestRoundData",
     query: {
+      enabled: !!PRICE_FEED_ADDRESSES.ETH_USD,
       refetchInterval: 30000,
       staleTime: 25000,
     },
   });
+
+  // Debug logging
+  console.log("ETH Price Feed:", {
+    address: PRICE_FEED_ADDRESSES.ETH_USD,
+    data: result.data,
+    error: result.error,
+    isLoading: result.isLoading,
+  });
+
+  return result;
 };
 
 // Hook to get LINK price from Chainlink
 export const useLINKPrice = () => {
-  return useReadContract({
+  const result = useReadContract({
     address: PRICE_FEED_ADDRESSES.LINK_USD,
     abi: CHAINLINK_ABI,
     functionName: "latestRoundData",
     query: {
+      enabled: !!PRICE_FEED_ADDRESSES.LINK_USD,
       refetchInterval: 30000,
       staleTime: 25000,
     },
   });
+
+  // Debug logging
+  console.log("LINK Price Feed:", {
+    address: PRICE_FEED_ADDRESSES.LINK_USD,
+    data: result.data,
+    error: result.error,
+    isLoading: result.isLoading,
+  });
+
+  return result;
 };
 
 // Hook to get price feeds
@@ -394,13 +428,46 @@ export const usePriceFeeds = () => {
 
   // Helper function to format price from Chainlink data
   const formatPrice = useCallback((data, decimals = 8) => {
-    if (!data || !data[1]) return null;
-    const price = Number(data[1]) / Math.pow(10, decimals);
-    return price.toFixed(2);
+    console.log("Formatting price data:", { data, decimals });
+
+    if (!data || !Array.isArray(data) || data.length < 2) {
+      console.log("Invalid data format:", data);
+      return null;
+    }
+
+    const priceValue = data[1]; // answer is at index 1
+    if (!priceValue) {
+      console.log("No price value found:", priceValue);
+      return null;
+    }
+
+    try {
+      // Convert BigInt to number and format
+      const rawPrice =
+        typeof priceValue === "bigint"
+          ? Number(priceValue)
+          : Number(priceValue);
+      const price = rawPrice / Math.pow(10, decimals);
+      const formatted = price.toFixed(2);
+
+      console.log("Price formatting:", {
+        raw: rawPrice,
+        decimals,
+        formatted,
+        priceValue,
+      });
+
+      return formatted;
+    } catch (error) {
+      console.error("Error formatting price:", error);
+      return null;
+    }
   }, []);
 
   // Update prices when data changes
   useEffect(() => {
+    console.log("Price data update:", { btcData, ethData, linkData });
+
     setIsLoading(btcLoading || ethLoading || linkLoading);
     setIsError(btcError || ethError || linkError);
 
@@ -410,10 +477,10 @@ export const usePriceFeeds = () => {
       link: formatPrice(linkData, 8), // LINK/USD has 8 decimals
     };
 
-    // Only update if we have at least one valid price
-    if (newPrices.btc || newPrices.eth || newPrices.link) {
-      setPrices(newPrices);
-    }
+    console.log("Formatted prices:", newPrices);
+
+    // Always update prices, even if some are null
+    setPrices(newPrices);
   }, [
     btcData,
     ethData,
@@ -432,7 +499,9 @@ export const usePriceFeeds = () => {
     // This function exists for compatibility but doesn't need to do anything
     // as the data is automatically refetched every 30 seconds
     console.log("Price feeds are automatically updated every 30 seconds");
-  }, []);
+    console.log("Current prices:", prices);
+    console.log("Feed addresses:", PRICE_FEED_ADDRESSES);
+  }, [prices]);
 
   return {
     prices,
@@ -449,15 +518,27 @@ export const useUserBalance = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchBalance = useCallback(async () => {
-    if (!address) return;
+    if (!address) {
+      setBalance("0");
+      return;
+    }
 
     setIsLoading(true);
     try {
-      // This would need proper implementation with a provider
-      // For now, using placeholder
-      setBalance("0.0");
+      // Use wagmi's getBalance for real ETH balance
+      const { getBalance } = await import("wagmi/actions");
+      const { config } = await import("../config/web3.js");
+
+      const balanceResult = await getBalance(config, {
+        address: address,
+      });
+
+      // Convert from wei to ETH with 4 decimal places
+      const ethBalance = parseFloat(balanceResult.formatted).toFixed(4);
+      setBalance(ethBalance);
     } catch (error) {
       console.error("Error fetching balance:", error);
+      setBalance("0");
     } finally {
       setIsLoading(false);
     }

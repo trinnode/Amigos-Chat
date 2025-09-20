@@ -58,8 +58,8 @@ AmigoChat is a revolutionary decentralized chat application built on the Ethereu
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/amigoschat.git
-   cd amigoschat
+   git clone https://github.com/trinnode/Amigos-Chat.git
+   cd amigos-chat
    ```
 
 2. **Install dependencies**
@@ -347,10 +347,10 @@ We welcome contributions to AmigoChat! Here's how you can help:
 
 ### Getting Help
 
-- 📧 Email: support@amigochat.app
-- 💬 Discord: [AmigoChat Community](https://discord.gg/amigochat)
-- 🐦 Twitter: [@AmigoChat_dApp](https://twitter.com/amigochat_dapp)
-- 📖 Documentation: [docs.amigochat.app](https://docs.amigochat.app)
+- 📧 Email: trinnex@gmail.com
+- 💬 Discord: [AmigoChat Community](https://discord.gg/trinnex)
+- 🐦 Twitter: [@AmigoChat_dApp](https://twitter.com/_trinnex_)
+- 📖 Documentation: [docs.amigochat.app](https://github.com/trinnode/Amigos-Chat/blob/main/DOCUMENTATION.md)
 
 ## 📄 License
 
