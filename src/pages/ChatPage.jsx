@@ -147,10 +147,20 @@ const ChatPage = () => {
 
   // Format timestamp
   const formatTime = (timestamp) => {
-    return new Date(timestamp * 1000).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    try {
+      // Handle BigInt timestamps from blockchain
+      const timeValue =
+        typeof timestamp === "bigint" ? Number(timestamp) : timestamp;
+      return new Date(timeValue * 1000).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
   };
 
   // Get user by address
@@ -158,6 +168,7 @@ const ChatPage = () => {
     if (!userAddress || !users || !Array.isArray(users)) {
       return null;
     }
+
     return users.find(
       (user) =>
         user &&
