@@ -271,55 +271,55 @@ export const useChangeUsername = () => {
 };
 
 // Chainlink AggregatorV3Interface ABI
-const CHAINLINK_ABI = [
-  {
-    inputs: [],
-    name: "decimals",
-    outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "description",
-    outputs: [{ internalType: "string", name: "", type: "string" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "uint80", name: "_roundId", type: "uint80" }],
-    name: "getRoundData",
-    outputs: [
-      { internalType: "uint80", name: "roundId", type: "uint80" },
-      { internalType: "int256", name: "answer", type: "int256" },
-      { internalType: "uint256", name: "startedAt", type: "uint256" },
-      { internalType: "uint256", name: "updatedAt", type: "uint256" },
-      { internalType: "uint80", name: "answeredInRound", type: "uint80" },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "latestRoundData",
-    outputs: [
-      { internalType: "uint80", name: "roundId", type: "uint80" },
-      { internalType: "int256", name: "answer", type: "int256" },
-      { internalType: "uint256", name: "startedAt", type: "uint256" },
-      { internalType: "uint256", name: "updatedAt", type: "uint256" },
-      { internalType: "uint80", name: "answeredInRound", type: "uint80" },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "version",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-];
+// const CHAINLINK_ABI = [
+//   {
+//     inputs: [],
+//     name: "decimals",
+//     outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
+//     stateMutability: "view",
+//     type: "function",
+//   },
+//   {
+//     inputs: [],
+//     name: "description",
+//     outputs: [{ internalType: "string", name: "", type: "string" }],
+//     stateMutability: "view",
+//     type: "function",
+//   },
+//   {
+//     inputs: [{ internalType: "uint80", name: "_roundId", type: "uint80" }],
+//     name: "getRoundData",
+//     outputs: [
+//       { internalType: "uint80", name: "roundId", type: "uint80" },
+//       { internalType: "int256", name: "answer", type: "int256" },
+//       { internalType: "uint256", name: "startedAt", type: "uint256" },
+//       { internalType: "uint256", name: "updatedAt", type: "uint256" },
+//       { internalType: "uint80", name: "answeredInRound", type: "uint80" },
+//     ],
+//     stateMutability: "view",
+//     type: "function",
+//   },
+//   {
+//     inputs: [],
+//     name: "latestRoundData",
+//     outputs: [
+//       { internalType: "uint80", name: "roundId", type: "uint80" },
+//       { internalType: "int256", name: "answer", type: "int256" },
+//       { internalType: "uint256", name: "startedAt", type: "uint256" },
+//       { internalType: "uint256", name: "updatedAt", type: "uint256" },
+//       { internalType: "uint80", name: "answeredInRound", type: "uint80" },
+//     ],
+//     stateMutability: "view",
+//     type: "function",
+//   },
+//   {
+//     inputs: [],
+//     name: "version",
+//     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+//     stateMutability: "view",
+//     type: "function",
+//   },
+// ];
 
 // Chainlink price feed addresses from environment
 const PRICE_FEED_ADDRESSES = {
@@ -335,8 +335,8 @@ console.log("Chainlink Price Feed Addresses:", PRICE_FEED_ADDRESSES);
 export const useBTCPrice = () => {
   const result = useReadContract({
     address: PRICE_FEED_ADDRESSES.BTC_USD,
-    abi: CHAINLINK_ABI,
-    functionName: "latestRoundData",
+    abi: AMIGO_CHAT_ABI,
+    functionName: "getLatestPriceBTCUSD",
     query: {
       enabled: !!PRICE_FEED_ADDRESSES.BTC_USD,
       refetchInterval: 30000, // Refetch every 30 seconds
@@ -359,8 +359,8 @@ export const useBTCPrice = () => {
 export const useETHPrice = () => {
   const result = useReadContract({
     address: PRICE_FEED_ADDRESSES.ETH_USD,
-    abi: CHAINLINK_ABI,
-    functionName: "latestRoundData",
+    abi: AMIGO_CHAT_ABI,
+    functionName: "getLatestPriceETHUSD",
     query: {
       enabled: !!PRICE_FEED_ADDRESSES.ETH_USD,
       refetchInterval: 30000,
@@ -383,8 +383,8 @@ export const useETHPrice = () => {
 export const useLINKPrice = () => {
   const result = useReadContract({
     address: PRICE_FEED_ADDRESSES.LINK_USD,
-    abi: CHAINLINK_ABI,
-    functionName: "latestRoundData",
+    abi: AMIGO_CHAT_ABI,
+    functionName: "getLatestPriceLINKUSD",
     query: {
       enabled: !!PRICE_FEED_ADDRESSES.LINK_USD,
       refetchInterval: 30000,

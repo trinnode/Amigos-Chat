@@ -1,5 +1,5 @@
-// Chat Page - Main application interface
-// Discord-like layout with user list, chat area, and price feeds
+// Chat Page - Modern Discord-like responsive interface
+// Completely redesigned for better UX and responsiveness
 
 import React, { useState, useEffect, useRef } from "react";
 import { useAccount } from "wagmi";
@@ -14,16 +14,18 @@ import { getIPFSUrl } from "../utils/ipfs.js";
 import { ButtonLoader } from "../components/LoadingSpinner.jsx";
 
 /**
- * Chat Page Component
- * Main interface for the AmigoChat application
+ * Chat Page Component - Discord-inspired design
+ * Features: Responsive layout, mobile support, modern UI
  */
 const ChatPage = () => {
   const { address } = useAccount();
   const messagesEndRef = useRef(null);
 
-  // Chat state
+  // UI State
   const [messageInput, setMessageInput] = useState("");
   const [showPrices, setShowPrices] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [showUserList, setShowUserList] = useState(true);
 
   // Contract hooks
   const {
@@ -76,359 +78,375 @@ const ChatPage = () => {
     );
   };
 
-  // Early return if essential data is not ready
+  // Loading state
   if (!address) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="text-center max-w-sm w-full">
+      <div className="h-screen flex items-center justify-center bg-amigo-black">
+        <div className="text-center">
           <div className="w-12 h-12 border-2 border-amigo-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="mt-4 text-amigo-green font-mono text-sm">
-            Loading wallet connection...
-          </p>
+          <p className="text-amigo-green font-mono">Loading wallet connection...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full min-h-screen bg-amigo-black flex flex-col">
-      {/* Top Navigation Bar */}
-      <div className="w-full bg-amigo-gray border-b border-amigo-green shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo and App Name */}
-            <div className="flex items-center space-x-4">
-              <img src="/logo.png" alt="AmigoChat" className="w-8 h-8" />
-              <h1 className="text-amigo-green font-bold font-mono text-xl">
-                AmigosChat
-              </h1>
-              <span className="text-amigo-gray-light font-mono text-sm">
-                Decentralized Messaging
-              </span>
-            </div>
-
-            {/* User Profile Section */}
-            <div className="flex items-center space-x-4">
-              <div className="hidden md:flex items-center space-x-2 text-amigo-white font-mono text-sm">
-                <span>Online Users: {(users || []).length}</span>
-              </div>
-              <div className="flex items-center space-x-3 bg-amigo-gray-light px-3 py-2 rounded-lg">
-                <img
-                  src="/logo.png"
-                  alt="Your Profile"
-                  className="w-8 h-8 rounded-full border border-amigo-green"
-                />
-                <div className="hidden sm:block text-amigo-white font-mono text-sm">
-                  <div className="font-semibold">You</div>
-                  <div className="text-amigo-gray-light text-xs">
-                    {address
-                      ? `${address.slice(0, 6)}...${address.slice(-4)}`
-                      : ""}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="h-screen flex bg-amigo-black overflow-hidden">
+      {/* Server List (Far Left) */}
+      <div className="hidden md:flex flex-col w-18 bg-amigo-gray-light border-r border-amigo-gray">
+        <div className="p-3 flex flex-col items-center space-y-3">
+          {/* Main Server */}
+          <Motion.div
+            whileHover={{ scale: 1.05, borderRadius: "35%" }}
+            className="w-12 h-12 bg-amigo-green rounded-full flex items-center justify-center cursor-pointer transition-all duration-200"
+          >
+            <span className="text-amigo-black font-bold text-xl">A</span>
+          </Motion.div>
+          
+          {/* Separator */}
+          <div className="w-8 h-0.5 bg-amigo-gray rounded-full"></div>
+          
+          {/* Price Feed Toggle */}
+          <Motion.div
+            whileHover={{ scale: 1.05, borderRadius: "35%" }}
+            onClick={() => setShowPrices(!showPrices)}
+            className={`w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ${
+              showPrices 
+                ? 'bg-amigo-green text-amigo-black' 
+                : 'bg-amigo-gray hover:bg-amigo-green hover:text-amigo-black text-amigo-white'
+            }`}
+          >
+            <span className="text-lg">📊</span>
+          </Motion.div>
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden w-full">
-        <div className="flex-1 max-w-7xl mx-auto w-full flex px-4 sm:px-6 lg:px-8">
-          {/* Left Sidebar - Users */}
-          <div className="hidden lg:flex w-80 bg-amigo-gray-light border-r border-amigo-gray flex-col">
-            <div className="p-4 border-b border-amigo-gray">
-              <h2 className="text-amigo-green font-mono font-bold text-lg flex items-center">
-                <span className="w-3 h-3 bg-amigo-green rounded-full mr-2"></span>
-                Online Amigos ({(users || []).length})
-              </h2>
-            </div>
+      {/* Channel List (Sidebar) */}
+      <AnimatePresence>
+        <Motion.div
+          initial={false}
+          animate={{ width: showSidebar ? 240 : 0 }}
+          className={`${showSidebar ? 'block' : 'hidden'} md:flex flex-col w-60 bg-amigo-gray border-r border-amigo-gray-light relative z-30`}
+        >
+          {/* Server Header */}
+          <div className="h-16 px-4 flex items-center border-b border-amigo-gray-light shadow-sm">
+            <h1 className="text-amigo-white font-bold font-mono text-lg truncate">
+              AmigosChat
+            </h1>
+            <button
+              onClick={() => setShowSidebar(false)}
+              className="md:hidden ml-auto p-1 text-amigo-gray-light hover:text-amigo-white rounded"
+            >
+              ✕
+            </button>
+          </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-2">
-              {loadingUsers ? (
-                <div className="space-y-3">
-                  {[...Array(8)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center space-x-3 p-3 bg-amigo-gray rounded-lg"
-                    >
-                      <div className="w-10 h-10 bg-amigo-gray-light rounded-full animate-pulse"></div>
-                      <div className="flex-1">
-                        <div className="w-24 h-4 bg-amigo-gray-light rounded animate-pulse mb-1"></div>
-                        <div className="w-32 h-3 bg-amigo-gray-light rounded animate-pulse"></div>
+          {/* Channels */}
+          <div className="flex-1 overflow-y-auto py-4">
+            <div className="px-2">
+              <div className="flex items-center px-2 py-1 text-amigo-gray-light font-mono text-xs font-semibold uppercase tracking-wide">
+                <span className="mr-1">#</span>
+                Text Channels
+              </div>
+              
+              <Motion.div
+                whileHover={{ backgroundColor: "rgba(78, 93, 148, 0.1)" }}
+                className="flex items-center px-2 py-1 mx-2 rounded text-amigo-white font-mono text-sm cursor-pointer"
+              >
+                <span className="mr-2 text-amigo-gray-light">#</span>
+                general
+                <div className="ml-auto w-2 h-2 bg-amigo-green rounded-full"></div>
+              </Motion.div>
+            </div>
+          </div>
+
+          {/* User Panel */}
+          <div className="h-16 bg-amigo-gray-light border-t border-amigo-gray px-2 flex items-center">
+            <div className="flex items-center flex-1 min-w-0">
+              <img
+                src="/logo.png"
+                alt="Avatar"
+                className="w-8 h-8 rounded-full border border-amigo-green"
+              />
+              <div className="ml-2 flex-1 min-w-0">
+                <div className="text-amigo-white font-mono text-sm font-semibold truncate">
+                  You
+                </div>
+                <div className="text-amigo-gray-light font-mono text-xs truncate">
+                  {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ""}
+                </div>
+              </div>
+            </div>
+            <button 
+              onClick={() => setShowUserList(!showUserList)}
+              className="p-1 text-amigo-gray-light hover:text-amigo-white rounded"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+              </svg>
+            </button>
+          </div>
+        </Motion.div>
+      </AnimatePresence>
+
+      {/* Mobile Overlay */}
+      {showSidebar && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
+          onClick={() => setShowSidebar(false)}
+        />
+      )}
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Chat Header */}
+        <div className="h-16 bg-amigo-gray border-b border-amigo-gray-light px-4 flex items-center justify-between shadow-sm">
+          <div className="flex items-center">
+            <button
+              onClick={() => setShowSidebar(!showSidebar)}
+              className="md:hidden p-2 text-amigo-gray-light hover:text-amigo-white rounded mr-2"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd"/>
+              </svg>
+            </button>
+            
+            <span className="text-amigo-gray-light mr-2 text-xl">#</span>
+            <h2 className="text-amigo-white font-bold font-mono text-lg">general</h2>
+            
+            <div className="hidden sm:block ml-4 text-amigo-gray-light font-mono text-sm">
+              Welcome to #general
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <div className="hidden sm:flex items-center text-amigo-gray-light font-mono text-sm">
+              <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+              {(users || []).length} online
+            </div>
+            
+            <button
+              onClick={() => setShowUserList(!showUserList)}
+              className="hidden lg:block p-2 text-amigo-gray-light hover:text-amigo-white rounded transition-colors"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Chat Messages Area */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Messages Container */}
+          <div className="flex-1 flex flex-col min-w-0">
+            {/* Messages List */}
+            <div className="flex-1 overflow-y-auto px-4 py-4">
+              {loadingMessages ? (
+                <div className="space-y-4">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="flex space-x-3">
+                      <div className="w-10 h-10 bg-amigo-gray rounded-full animate-pulse"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="w-32 h-4 bg-amigo-gray rounded animate-pulse"></div>
+                        <div className="w-full h-4 bg-amigo-gray rounded animate-pulse"></div>
                       </div>
                     </div>
                   ))}
                 </div>
-              ) : (
-                (users || [])
-                  .filter((user) => user && user.address)
-                  .map((user) => (
-                    <div
-                      key={user.address}
-                      className="flex items-center space-x-3 p-3 bg-amigo-gray rounded-lg hover:bg-amigo-gray-light transition-all cursor-pointer"
-                    >
-                      <div className="relative">
-                        <img
-                          src={
-                            getIPFSUrl(user.ipfsProfilePicHash) || "/logo.png"
-                          }
-                          alt={user.username || "Unknown User"}
-                          className="w-10 h-10 rounded-full object-cover border-2 border-amigo-green"
-                        />
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-amigo-green rounded-full border-2 border-amigo-gray"></div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-amigo-white font-mono text-sm font-semibold truncate">
-                          {user.username || "Unknown User"}
-                          {user.address === address && (
-                            <span className="text-amigo-green ml-2">(You)</span>
-                          )}
-                        </p>
-                        <p className="text-amigo-gray-light font-mono text-xs truncate">
-                          {user.address && user.address.length >= 10
-                            ? `${user.address.slice(
-                                0,
-                                8
-                              )}...${user.address.slice(-6)}`
-                            : user.address || "Invalid Address"}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-              )}
-            </div>
-
-            {/* Price Feed Toggle */}
-            <div className="p-4 border-t border-amigo-gray">
-              <button
-                onClick={() => {
-                  setShowPrices(!showPrices);
-                  if (!showPrices) fetchPrices();
-                }}
-                className="btn btn-ghost w-full text-sm"
-              >
-                📊 {showPrices ? "Hide" : "Show"} Live Prices
-              </button>
-            </div>
-          </div>
-
-          {/* Main Chat Area */}
-          <div className="flex-1 flex flex-col min-w-0 bg-amigo-black">
-            {/* Chat Header */}
-            <div className="bg-amigo-gray border-b border-amigo-gray-light p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-amigo-green font-mono font-bold text-xl flex items-center">
-                    <span className="mr-2">#</span>
-                    general
-                  </h2>
-                  <p className="text-amigo-gray-light font-mono text-sm">
-                    Welcome to the general chat •{" "}
-                    {messages ? messages.length : 0} messages
+              ) : !messages || messages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <div className="text-6xl mb-4">💬</div>
+                  <h3 className="text-amigo-white font-mono text-xl font-bold mb-2">
+                    Welcome to #general!
+                  </h3>
+                  <p className="text-amigo-gray-light font-mono max-w-md">
+                    This is the beginning of the general channel. Start the conversation!
                   </p>
                 </div>
+              ) : (
+                <div className="space-y-4">
+                  {(messages || [])
+                    .filter((message) => message && message.sender)
+                    .map((message, index) => {
+                      const user = getUserByAddress(message.sender);
+                      const isCurrentUser =
+                        message.sender &&
+                        address &&
+                        message.sender.toLowerCase() === address.toLowerCase();
 
-                {/* Mobile menu button */}
-                <button
-                  className="lg:hidden btn btn-ghost"
-                  onClick={() => {
-                    /* Toggle mobile sidebar */
-                  }}
-                >
-                  👥 {(users || []).length}
-                </button>
-              </div>
-            </div>
-
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto bg-amigo-black">
-              <div className="max-w-4xl mx-auto px-6 py-4">
-                {loadingMessages ? (
-                  <div className="space-y-6">
-                    {[...Array(8)].map((_, i) => (
-                      <div key={i} className="flex space-x-4">
-                        <div className="w-10 h-10 bg-amigo-gray rounded-full animate-pulse"></div>
-                        <div className="flex-1">
-                          <div className="w-32 h-4 bg-amigo-gray rounded animate-pulse mb-2"></div>
-                          <div className="w-full h-3 bg-amigo-gray rounded animate-pulse"></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : !messages || messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-center py-20">
-                    <div className="text-8xl mb-6">💬</div>
-                    <h3 className="text-amigo-white font-mono text-2xl font-bold mb-4">
-                      Welcome to #general!
-                    </h3>
-                    <p className="text-amigo-gray-light font-mono text-lg max-w-lg leading-relaxed">
-                      This is the beginning of the general channel. Start the
-                      conversation and be the first amigo to send a message in
-                      this decentralized chat!
-                    </p>
-                    <div className="mt-8 px-6 py-3 bg-amigo-gray rounded-lg border border-amigo-green">
-                      <p className="text-amigo-green font-mono text-sm">
-                        💡 Your messages are stored on the blockchain forever
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-6 pb-4">
-                    {(messages || [])
-                      .filter((message) => message && message.sender)
-                      .map((message, index) => {
-                        const user = getUserByAddress(message.sender);
-                        const isCurrentUser =
-                          message.sender &&
-                          address &&
-                          message.sender.toLowerCase() ===
-                            address.toLowerCase();
-
-                        return (
-                          <Motion.div
-                            key={`${message.messageId}-${index}`}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="flex space-x-4 group hover:bg-amigo-gray/10 p-4 rounded-xl transition-all duration-200 border border-transparent hover:border-amigo-gray"
-                          >
-                            <img
-                              src={
-                                getIPFSUrl(user?.ipfsProfilePicHash) ||
-                                "/logo.png"
-                              }
-                              alt={user?.username || "Unknown"}
-                              className="w-12 h-12 rounded-full object-cover border-2 border-amigo-green shadow-lg"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center space-x-3 mb-2">
-                                <span
-                                  className={`font-mono font-bold text-base ${
-                                    isCurrentUser
-                                      ? "text-amigo-green"
-                                      : "text-amigo-white"
-                                  }`}
-                                >
-                                  {user?.username || "Unknown"}
-                                </span>
-                                {isCurrentUser && (
-                                  <span className="text-amigo-green font-mono text-sm">
-                                    (You)
-                                  </span>
-                                )}
-                                <span className="text-amigo-gray-light font-mono text-sm">
-                                  {formatTime(message.timestamp)}
-                                </span>
-                              </div>
-                              <p className="text-amigo-white font-mono text-base break-words leading-relaxed">
-                                {message.content}
-                              </p>
+                      return (
+                        <Motion.div
+                          key={`${message.messageId}-${index}`}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="flex space-x-3 hover:bg-amigo-gray/5 p-2 rounded-lg group transition-colors duration-150"
+                        >
+                          <img
+                            src={getIPFSUrl(user?.ipfsProfilePicHash) || "/logo.png"}
+                            alt={user?.username || "Unknown"}
+                            className="w-10 h-10 rounded-full object-cover border border-amigo-gray-light"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-baseline space-x-2 mb-1">
+                              <span className={`font-mono font-semibold text-sm ${
+                                isCurrentUser ? "text-amigo-green" : "text-amigo-white"
+                              }`}>
+                                {user?.username || "Unknown"}
+                              </span>
+                              <span className="text-amigo-gray-light font-mono text-xs">
+                                {formatTime(message.timestamp)}
+                              </span>
                             </div>
-                          </Motion.div>
-                        );
-                      })}
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
+                            <p className="text-amigo-white font-mono text-sm break-words leading-relaxed">
+                              {message.content}
+                            </p>
+                          </div>
+                        </Motion.div>
+                      );
+                    })}
+                </div>
+              )}
+              <div ref={messagesEndRef} />
             </div>
 
-            {/* Message Input Area */}
-            <div className="border-t border-amigo-gray bg-amigo-gray">
-              <div className="max-w-4xl mx-auto px-6 py-4">
-                <form
-                  onSubmit={handleSendMessage}
-                  className="flex space-x-4 items-end"
+            {/* Message Input */}
+            <div className="p-4 border-t border-amigo-gray">
+              <form onSubmit={handleSendMessage} className="flex space-x-3">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    value={messageInput}
+                    onChange={(e) => setMessageInput(e.target.value)}
+                    placeholder="Message #general"
+                    className="w-full px-4 py-3 bg-amigo-gray-light border border-amigo-gray rounded-lg text-amigo-white font-mono placeholder-amigo-gray-light focus:border-amigo-green focus:outline-none transition-colors"
+                    maxLength="1000"
+                    disabled={isSending}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={!messageInput.trim() || isSending}
+                  className="px-4 py-3 bg-amigo-green text-amigo-black font-mono font-semibold rounded-lg hover:bg-amigo-green/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <div className="flex-1">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={messageInput}
-                        onChange={(e) => setMessageInput(e.target.value)}
-                        placeholder="Send a message to #general..."
-                        className="w-full px-4 py-3 pr-14 bg-amigo-black border-2 border-amigo-gray-light rounded-xl text-amigo-white font-mono placeholder-amigo-gray-light focus:border-amigo-green focus:outline-none transition-colors text-base"
-                        maxLength="1000"
-                        disabled={isSending}
-                      />
-                      <button
-                        type="submit"
-                        disabled={!messageInput.trim() || isSending}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-amigo-green rounded-lg flex items-center justify-center hover:bg-amigo-green/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isSending ? (
-                          <div className="w-4 h-4 border-2 border-amigo-black border-t-transparent rounded-full animate-spin"></div>
-                        ) : (
-                          <span className="text-amigo-black text-lg">➤</span>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </form>
-                <p className="text-amigo-gray-light font-mono text-sm mt-3 text-center">
-                  Press Enter to send • Messages are stored permanently on the
-                  blockchain
-                </p>
-              </div>
+                  {isSending ? (
+                    <div className="w-5 h-5 border-2 border-amigo-black border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    "Send"
+                  )}
+                </button>
+              </form>
             </div>
           </div>
-        </div>
 
-        {/* Right Sidebar - Price Feed */}
-        <AnimatePresence>
-          {showPrices && (
-            <Motion.div
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 280, opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              className="bg-amigo-gray border-l border-amigo-gray-light overflow-hidden"
-            >
-              <div className="p-4 border-b border-amigo-gray-light">
-                <h3 className="text-amigo-green font-mono font-bold">
-                  Live Prices
-                </h3>
-                <p className="text-amigo-gray-light font-mono text-xs">
-                  Powered by Chainlink
-                </p>
-              </div>
-
-              <div className="p-4 space-y-4">
-                {loadingPrices ? (
-                  <div className="space-y-3">
-                    {["BTC", "ETH", "LINK"].map((symbol) => (
-                      <div
-                        key={symbol}
-                        className="bg-amigo-gray-light p-3 rounded-lg"
-                      >
-                        <div className="w-16 h-4 bg-amigo-gray rounded animate-pulse mb-2"></div>
-                        <div className="w-24 h-6 bg-amigo-gray rounded animate-pulse"></div>
-                      </div>
-                    ))}
+          {/* Right Sidebar - Members & Price Feeds */}
+          <AnimatePresence>
+            {showUserList && (
+              <Motion.div
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: 240, opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                className="hidden lg:flex bg-amigo-gray border-l border-amigo-gray-light flex-col overflow-hidden"
+              >
+                {/* Members Section */}
+                <div className="flex-1 overflow-y-auto">
+                  <div className="p-3 border-b border-amigo-gray-light">
+                    <h3 className="text-amigo-gray-light font-mono text-xs font-semibold uppercase tracking-wide">
+                      Members — {(users || []).length}
+                    </h3>
                   </div>
-                ) : (
-                  <>
-                    <PriceCard symbol="BTC" price={prices.btc} />
-                    <PriceCard symbol="ETH" price={prices.eth} />
-                    <PriceCard symbol="LINK" price={prices.link} />
+                  
+                  <div className="p-2 space-y-1">
+                    {loadingUsers ? (
+                      <div className="space-y-2">
+                        {[...Array(5)].map((_, i) => (
+                          <div key={i} className="flex items-center space-x-2 p-2">
+                            <div className="w-8 h-8 bg-amigo-gray-light rounded-full animate-pulse"></div>
+                            <div className="w-20 h-3 bg-amigo-gray-light rounded animate-pulse"></div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      (users || [])
+                        .filter((user) => user && user.address)
+                        .map((user) => (
+                          <div
+                            key={user.address}
+                            className="flex items-center space-x-2 p-2 rounded hover:bg-amigo-gray-light/30 cursor-pointer transition-colors"
+                          >
+                            <div className="relative">
+                              <img
+                                src={getIPFSUrl(user.ipfsProfilePicHash) || "/logo.png"}
+                                alt={user.username || "Unknown"}
+                                className="w-8 h-8 rounded-full object-cover border border-amigo-gray"
+                              />
+                              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-amigo-gray"></div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-amigo-white font-mono text-sm truncate">
+                                {user.username || "Unknown"}
+                                {user.address === address && (
+                                  <span className="text-amigo-green text-xs ml-1">(you)</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                    )}
+                  </div>
+                </div>
 
-                    <button
-                      onClick={fetchPrices}
-                      className="btn btn-ghost w-full text-sm mt-4"
+                {/* Price Feeds Section */}
+                <AnimatePresence>
+                  {showPrices && (
+                    <Motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="border-t border-amigo-gray-light overflow-hidden"
                     >
-                      🔄 Refresh Prices
-                    </button>
-                  </>
-                )}
-              </div>
-            </Motion.div>
-          )}
-        </AnimatePresence>
+                      <div className="p-3">
+                        <h3 className="text-amigo-gray-light font-mono text-xs font-semibold uppercase tracking-wide mb-3">
+                          Live Prices
+                        </h3>
+                        
+                        {loadingPrices ? (
+                          <div className="space-y-2">
+                            {["BTC", "ETH", "LINK"].map((symbol) => (
+                              <div key={symbol} className="bg-amigo-gray-light p-2 rounded">
+                                <div className="w-16 h-3 bg-amigo-gray rounded animate-pulse mb-1"></div>
+                                <div className="w-20 h-4 bg-amigo-gray rounded animate-pulse"></div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <PriceCard symbol="BTC" price={prices.btc} />
+                            <PriceCard symbol="ETH" price={prices.eth} />
+                            <PriceCard symbol="LINK" price={prices.link} />
+                            
+                            <button
+                              onClick={fetchPrices}
+                              className="w-full text-amigo-gray-light hover:text-amigo-white font-mono text-xs py-2 transition-colors"
+                            >
+                              🔄 Refresh
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </Motion.div>
+                  )}
+                </AnimatePresence>
+              </Motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
 };
 
-// Price Card Component
+// Enhanced Price Card Component
 const PriceCard = ({ symbol, price }) => {
   const formatPrice = (price) => {
     if (!price) return "N/A";
@@ -441,13 +459,25 @@ const PriceCard = ({ symbol, price }) => {
     });
   };
 
+  const getIcon = (symbol) => {
+    switch (symbol) {
+      case "BTC": return "₿";
+      case "ETH": return "Ξ";
+      case "LINK": return "🔗";
+      default: return "💰";
+    }
+  };
+
   return (
-    <div className="bg-amigo-gray-light p-3 rounded-lg border border-amigo-green border-opacity-30">
-      <div className="flex justify-between items-center">
-        <span className="text-amigo-white font-mono font-bold text-sm">
-          {symbol}/USD
-        </span>
-        <span className="text-amigo-green font-mono text-lg font-bold">
+    <div className="bg-amigo-gray-light p-2 rounded border-l-2 border-amigo-green transition-all hover:bg-amigo-gray">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-1">
+          <span className="text-sm">{getIcon(symbol)}</span>
+          <span className="text-amigo-white font-mono text-xs font-semibold">
+            {symbol}
+          </span>
+        </div>
+        <span className="text-amigo-green font-mono text-xs font-bold">
           {formatPrice(price)}
         </span>
       </div>
