@@ -9,6 +9,12 @@
   [![Chainlink Oracles](https://img.shields.io/badge/Oracles-Chainlink-375BD2?style=for-the-badge&logo=chainlink)](https://chain.link/)
 </div>
 
+
+### CONTRACT ADDRESS
+```
+0xe5E9BD5a3fA0Af6C707C1A385D7f655251Ca63EB
+
+```
 ## 📖 Overview
 
 AmigoChat is a revolutionary decentralized chat application built on the Ethereum blockchain. It combines the familiar Discord-like user experience with the power of Web3 technology, offering users true ownership of their data and identity.
