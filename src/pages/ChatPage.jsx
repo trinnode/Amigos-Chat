@@ -92,14 +92,38 @@ const ChatPage = () => {
 
     let message = `🤖 **Price Update ${timestamp}** 📊\n\n`;
 
+    // Helper function to safely format price values (handles BigInt and strings)
+    const safePriceFormat = (price) => {
+      if (!price) return null;
+      try {
+        // Convert BigInt to string first if needed
+        const priceStr =
+          typeof price === "bigint" ? price.toString() : String(price);
+        const priceNum = parseFloat(priceStr);
+        return isNaN(priceNum) ? null : priceNum.toLocaleString();
+      } catch (error) {
+        console.error("Error formatting price:", error);
+        return null;
+      }
+    };
+
     if (prices.btc) {
-      message += `₿ BTC: $${parseFloat(prices.btc).toLocaleString()}\n`;
+      const formattedBTC = safePriceFormat(prices.btc);
+      if (formattedBTC) {
+        message += `₿ BTC: $${formattedBTC}\n`;
+      }
     }
     if (prices.eth) {
-      message += `Ξ ETH: $${parseFloat(prices.eth).toLocaleString()}\n`;
+      const formattedETH = safePriceFormat(prices.eth);
+      if (formattedETH) {
+        message += `Ξ ETH: $${formattedETH}\n`;
+      }
     }
     if (prices.link) {
-      message += `🔗 LINK: $${parseFloat(prices.link).toLocaleString()}\n`;
+      const formattedLINK = safePriceFormat(prices.link);
+      if (formattedLINK) {
+        message += `🔗 LINK: $${formattedLINK}\n`;
+      }
     }
 
     message += `\n📡 Powered by Chainlink Oracles`;
@@ -635,7 +659,15 @@ const PriceUpdateMessage = ({ content }) => {
                 {cleanSymbol}
               </span>
               <span className="text-amigo-green font-mono text-sm font-bold">
-                ${parseFloat(cleanValue).toLocaleString()}
+                $
+                {(() => {
+                  try {
+                    const num = parseFloat(cleanValue);
+                    return isNaN(num) ? cleanValue : num.toLocaleString();
+                  } catch {
+                    return cleanValue;
+                  }
+                })()}
               </span>
             </div>
           );
@@ -654,13 +686,25 @@ const PriceUpdateMessage = ({ content }) => {
 const PriceCard = ({ symbol, price }) => {
   const formatPrice = (price) => {
     if (!price) return "N/A";
-    const num = parseFloat(price);
-    return num.toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+
+    try {
+      // Handle BigInt conversion safely
+      const priceStr =
+        typeof price === "bigint" ? price.toString() : String(price);
+      const num = parseFloat(priceStr);
+
+      if (isNaN(num)) return "N/A";
+
+      return num.toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    } catch (error) {
+      console.error("Error formatting price in PriceCard:", error);
+      return "N/A";
+    }
   };
 
   const getIcon = (symbol) => {
